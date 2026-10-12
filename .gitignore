@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+dist/
+.env*
+!.env.example
+.local/
+data/events.json
+data/overrides.local.json
+next-env.d.ts
+*.tsbuildinfo
+*.log
+.vercel/
+.wrangler/
+.openai/
+.playwright-cli/

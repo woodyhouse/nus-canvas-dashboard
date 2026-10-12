@@ -1,0 +1,31 @@
+{
+  "demo": true,
+  "updatedAt": "2026-10-12T12:00:00+08:00",
+  "semester": "Demo semester",
+  "calendar": { "start": "2026-08-10", "end": "2026-11-13", "excludedDates": [], "breaks": [] },
+  "sources": [
+    { "name": "虚构演示数据", "detail": "所有课程、事项、场地和日期均为虚构 UI 示例，不包含作者的课表、成绩或账户信息。" },
+    { "name": "Canvas API", "detail": "授权后由本机只读同步。当前尚未连接账户，也未开启自动巡检。" }
+  ],
+  "courses": [
+    { "code": "DEMO101", "name": "Data & Algorithms", "color": "#005aa9" },
+    { "code": "DEMO202", "name": "Probability Studio", "color": "#2f78a6" },
+    { "code": "DEMO303", "name": "Optimization Lab", "color": "#d56700" },
+    { "code": "DEMO404", "name": "Decision Science", "color": "#ef7c00" }
+  ],
+  "meetings": [
+    { "course": "DEMO101", "weekday": 1, "start": "14:00", "end": "16:00", "venue": "Demo Room A", "weeks": "configured term" },
+    { "course": "DEMO202", "weekday": 2, "start": "16:00", "end": "18:00", "venue": "Demo Room B", "weeks": "configured term" },
+    { "course": "DEMO303", "weekday": 3, "start": "19:00", "end": "22:00", "venue": "Demo Room C", "weeks": "configured term" },
+    { "course": "DEMO404", "weekday": 5, "start": "14:00", "end": "17:00", "venue": "Demo Room D", "weeks": "configured term" }
+  ],
+  "events": [
+    { "id": "demo-a1", "course": "DEMO101", "type": "assignment", "title": "Assignment 2", "date": "2026-10-15", "time": "23:59", "status": "upcoming", "detail": "虚构示例：上传一份 PDF，含算法思路与复杂度分析。", "action": "准备并提交 PDF" },
+    { "id": "demo-q1", "course": "DEMO202", "type": "quiz", "title": "Quiz 2", "date": "2026-10-17", "time": "14:00", "status": "upcoming", "detail": "虚构示例：60 分钟课堂测验，Demo Room B。", "action": "复习并准备设备" },
+    { "id": "demo-a2", "course": "DEMO303", "type": "assignment", "title": "Problem Set 3", "date": "2026-10-21", "time": "18:00", "status": "upcoming", "detail": "虚构示例：完成建模与求解题。", "action": "核对解答" },
+    { "id": "demo-final", "course": "DEMO404", "type": "exam", "title": "Final exam", "date": "2026-11-25", "time": "09:00", "status": "upcoming", "detail": "虚构示例：考试时间 09:00–11:00，场地待确认。", "action": "制定复习计划" },
+    { "id": "demo-pending", "course": "DEMO303", "type": "midterm", "title": "Midterm 日期待公布", "date": null, "time": "", "status": "pending", "detail": "虚构示例：尚未公布日期，保持追踪。", "action": "等待课程公告" },
+    { "id": "demo-history", "course": "DEMO101", "type": "material", "title": "Lecture notes 发布", "date": "2026-10-08", "time": "10:00", "status": "history", "detail": "虚构示例：最新课件已发布。", "action": "阅读课件" },
+    { "id": "demo-notice", "course": "DEMO202", "type": "announcement", "title": "课程答疑安排", "date": "2026-10-10", "time": "12:00", "status": "history", "detail": "虚构示例：答疑时间请查看课程公告。", "action": "查看公告" }
+  ]
+}
