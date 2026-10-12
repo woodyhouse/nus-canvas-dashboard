@@ -4,6 +4,9 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { environment, accessToken, getAll, writeJsonAtomic, root } from './canvas.mjs';
 export function plain(html = '') { return html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(); }
+export function sectionUnavailable(section, status) {
+  return ['quizzes', 'files'].includes(section) && [403, 404].includes(status);
+}
 export function wall(iso) {
   if (!iso) return { date: null, time: '' };
   const str = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Singapore', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso));
@@ -47,7 +50,7 @@ export async function sync() {
         if (section === 'announcements') rows.forEach(a => put({ id: `canvas-announcement-${a.id}`, course: code, type: 'announcement', title: a.title, ...wall(a.posted_at), status: 'history', detail: `${plain(a.message)} 来源：${a.html_url || `Canvas Announcement ${a.id}`}`, action: '查看原始公告；正文日期需进一步核验' }));
         if (section === 'calendar') rows.filter(r => r.start_at && !r.assignment).forEach(r => put({ id: `canvas-calendar-${r.id}`, course: code, type: 'academic', title: r.title, ...wall(r.start_at), status: 'upcoming', detail: `${plain(r.description)} 来源：Canvas Calendar ${r.id}；结束：${r.end_at || '未公布'}。`, action: '查看课程日历安排' }));
       } catch (error) {
-        if (section === 'quizzes' && [403,404].includes(error.status)) unavailable.push({ course: code, section, status: error.status });
+        if (sectionUnavailable(section, error.status)) unavailable.push({ course: code, section, status: error.status });
         else errors.push({ course: code, section, message: error.message });
         if (prior[key]) snapshot[key] = prior[key];
       }
@@ -60,7 +63,7 @@ export async function sync() {
   const overridesPath = resolve(root, 'data/overrides.local.json');
   const overrides = existsSync(overridesPath) ? JSON.parse(readFileSync(overridesPath, 'utf8')) : {};
   for (const event of overrides.events || []) preserved.set(event.id, event);
-  const data = { demo: false, updatedAt: new Date().toISOString(), semester: overrides.semester || 'Canvas active courses', courses: courseRows, meetings: overrides.meetings || [], ...(overrides.calendar ? { calendar: overrides.calendar } : {}), events: [...preserved.values()], sources: [{ name: 'Canvas API', detail: '只读 OAuth 同步：作业、公告、Modules、Files 元数据与 Calendar。保留历史事件；课件内的考试规则需要 agent 单独核验。未收集成绩与学生名单。' + (unavailable.length ? ` ${unavailable.length} 门课的 Quizzes 栏目不可用，请通过浏览器补查。` : ' Quizzes 查询成功。') }, { name: '本地核验补充', detail: 'data/overrides.local.json；用于教学周、课表和课件核验事实。' }] };
+  const data = { demo: false, updatedAt: new Date().toISOString(), semester: overrides.semester || 'Canvas active courses', courses: courseRows, meetings: overrides.meetings || [], ...(overrides.calendar ? { calendar: overrides.calendar } : {}), events: [...preserved.values()], sources: [{ name: 'Canvas API', detail: '只读 API 同步：作业、公告、Modules、Files 元数据与 Calendar。保留历史事件；课件内的考试规则需要 agent 单独核验。未收集成绩与学生名单。' + (unavailable.length ? ` 未核验栏目：${unavailable.map(u => `${u.course} / ${u.section} (HTTP ${u.status})`).join('；')}。保留旧记录，请通过浏览器补查；不可用不等于没有内容。` : ' Files / Quizzes 查询成功。') }, { name: '本地核验补充', detail: 'data/overrides.local.json；用于教学周、课表和课件核验事实。' }] };
   writeJsonAtomic(target, data); writeJsonAtomic(priorPath, snapshot);
   writeJsonAtomic(resolve(root, '.local/last-check.json'), { checkedAt: data.updatedAt, changes: [...new Set(changes)], errors: [], unavailable });
   console.log(`Synced ${courses.length} courses; ${new Set(changes).size} changed records/sections. Rebuild to deploy the refreshed private snapshot.`);

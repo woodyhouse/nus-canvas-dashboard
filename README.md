@@ -80,7 +80,7 @@ Without an approved key, institutional/multi-user integration remains blocked; t
 - Use your own submission record, never a class-wide submission flag.
 - Record changed section hashes and changed events in `.local/last-check.json`.
 - Refresh OAuth tokens when needed; personal testing tokens require user replacement on expiry. Keep credentials and personal data out of Git.
-- Preserve the previous dashboard and baseline when a required section fails. Disabled Quizzes (403/404) are explicitly marked unavailable for browser follow-up.
+- Preserve the previous dashboard and baseline when a required section fails. Disabled/inaccessible Quizzes or Files (403/404) are explicitly marked unavailable for browser follow-up; existing records are preserved and missing access never means no content.
 
 ## What still needs verification?
 
