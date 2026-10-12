@@ -41,6 +41,8 @@ For **your own local testing**, an agent can open [Canvas settings](https://canv
 npm run canvas:connect
 ```
 
+`scripts/token-browser.mjs` automates opening the token form, filling its purpose and 30-day expiry, and verifying the parsed date in an existing authenticated Playwright or Codex side-panel browser. See [browser automation](skills/canvas-dashboard-setup/references/browser-automation.md). One confirmation is required before creating the credential; then copy and paste it into the hidden-input terminal. A new CLI browser does not inherit the side-panel login, so agents should reuse the authenticated controllable browser.
+
 This creates the private local configuration and opens a separate visible native terminal. After action-time confirmation of the purpose and expiry, the agent may generate the credential when its tools allow it, or hand that final click to you. You copy the token and paste it into the terminal; **input is hidden and never sent to chat**. The helper validates it with a read-only request, stores it encrypted, then automatically syncs, builds and starts the dashboard on an available loopback port. Your agent reads only a non-secret status receipt and opens its URL once ready. Keep that terminal open while using the dashboard. On future runs, `npm run canvas:resume` reuses the stored credential; no new token is needed unless it expired or was revoked.
 
 If a native terminal cannot be launched, run `npm run canvas:token` in your own terminal. Tokens may carry broader permissions than this read-only app, and expiry/revocation requires user-controlled replacement. Never send the token to the maintainer or a shared deployment.

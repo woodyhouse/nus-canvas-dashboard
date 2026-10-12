@@ -41,6 +41,8 @@ npm run dev
 npm run canvas:connect
 ```
 
+仓库提供 `scripts/token-browser.mjs`：agent 可在已有登录状态的 Playwright 浏览器或 Codex 侧边浏览器中，自动打开 token 弹窗、填写用途与 30 天有效期，并核验日期。操作示例见 [浏览器自动化流程](skills/canvas-dashboard-setup/references/browser-automation.md)。登录后无需你逐项寻找按钮；新增凭据前仍需确认一次，之后你只需复制并粘贴到隐藏输入终端。新建 Playwright 浏览器与侧边浏览器的登录状态独立，agent 应优先复用已登录的可控浏览器。
+
 脚本会自动创建本机私有配置，并弹出一个独立的、可见的命令行窗口。确认凭据用途与有效期后，agent 可在工具允许时生成 token，也可以将生成按钮交给你点击。你复制 token 并粘贴到该窗口；**输入不回显，也不会进入聊天**。脚本用只读请求验证 token，加密保存在本机，然后自动同步、构建，并在空闲的本机回环端口启动看板。Agent 只读取不含凭据的状态回执，成功后打开其中的看板地址。使用看板期间请保留该终端窗口。之后运行 `npm run canvas:resume` 即可复用已保存的凭据，无需再次生成 token，除非它已到期或被撤销。
 
 若系统无法弹出原生终端，请在自己的命令行执行 `npm run canvas:token`。个人 token 的权限可能大于本应用使用的只读权限；到期或撤销后需要用户重新配置。不要将 token 发给作者或共享部署服务。
