@@ -1,10 +1,12 @@
 # NUS Canvas Dashboard
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 An Apple-inspired, responsive course dashboard for deadlines, quizzes, course notices and a semester calendar. Built with Next.js, React and Tailwind CSS. Self-hosted and agent-friendly.
 
-中文：把课程事项放进一张清晰的看板，保留历史、查看临近截止，并能在手机上使用。此项目为学生个人开源项目，与 NUS 或 Instructure 无官方关联。
+An independent student open-source project, not affiliated with or endorsed by NUS or Instructure.
 
-## Preview / 预览
+## Preview
 
 Screenshots use **fictional demo courses only**. No student identity, grades, real coursework or author account information is included.
 
