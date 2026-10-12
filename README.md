@@ -33,6 +33,22 @@ Open http://localhost:3000. `predev` creates an ignored `data/events.json` from 
 
 ## Connect your Canvas account
 
+### Personal local testing: browser + hidden terminal
+
+For **your own local testing**, an agent can open [Canvas settings](https://canvas.nus.edu.sg/profile/settings), prepare the New Access Token dialog and run:
+
+```bash
+npm run canvas:connect
+```
+
+This creates the private local configuration and opens a separate visible native terminal. After action-time confirmation of the purpose and expiry, the agent may generate the credential when its tools allow it, or hand that final click to you. You copy the token and paste it into the terminal; **input is hidden and never sent to chat**. The helper validates it with a read-only request, stores it encrypted, then automatically syncs, builds and starts the dashboard on an available loopback port. Your agent reads only a non-secret status receipt and opens its URL once ready. Keep that terminal open while using the dashboard. On future runs, `npm run canvas:resume` reuses the stored credential; no new token is needed unless it expired or was revoked.
+
+If a native terminal cannot be launched, run `npm run canvas:token` in your own terminal. Tokens may carry broader permissions than this read-only app, and expiry/revocation requires user-controlled replacement. Never send the token to the maintainer or a shared deployment.
+
+**Policy boundary:** Canvas permits manual tokens for application testing and requires OAuth for applications used by multiple users. This testing path is not a substitute for approved institutional/multi-user onboarding. See [Canvas's manual-token guidance](https://developerdocs.instructure.com/services/canvas/oauth2/file.oauth#manual-token-generation).
+
+### Institutional / multi-user OAuth
+
 **Important prerequisite:** login alone does not grant API access. Canvas requires an approved OAuth Developer Key for apps used by others. For hosted Canvas, your institution's administrator issues this key. This repository does not include a shared client secret and does not ask classmates to generate personal access tokens for a distributed application. See [Canvas OAuth documentation](https://developerdocs.instructure.com/services/canvas/oauth2/file.oauth).
 
 This release includes a **single-user local OAuth client**. An institution must approve a client for the individual deployment and register its exact redirect URI. A shared institutional integration needs an administrator-managed backend; never distribute its client secret to every student.
@@ -52,7 +68,7 @@ npm run dev
 
 Administrator scopes: allow only the GET endpoints needed for active courses, assignments (including the current user's submission), announcements, quizzes, modules and items, files, and calendar events. Enforce these scopes on the Developer Key. An unscoped token can have wider rights even though this app uses read-only API calls.
 
-Without an approved key, use the demo or your own offline, normalized data. Agents must report this blocker honestly. They should not scrape browser-session secrets or create broad credentials to bypass it.
+Without an approved key, institutional/multi-user integration remains blocked; the demo and offline data remain available. Personal local testing is a separate, explicit mode described above. Agents must not scrape browser-session secrets or silently generate broad credentials.
 
 ## What is automatic?
 
@@ -61,7 +77,7 @@ Without an approved key, use the demo or your own offline, normalized data. Agen
 - Normalize Canvas timestamps to Asia/Singapore and preserve historical events.
 - Use your own submission record, never a class-wide submission flag.
 - Record changed section hashes and changed events in `.local/last-check.json`.
-- Refresh OAuth tokens when needed; keep credentials and personal data out of Git.
+- Refresh OAuth tokens when needed; personal testing tokens require user replacement on expiry. Keep credentials and personal data out of Git.
 - Preserve the previous dashboard and baseline when a required section fails. Disabled Quizzes (403/404) are explicitly marked unavailable for browser follow-up.
 
 ## What still needs verification?
@@ -78,16 +94,22 @@ The included agent skill gives a procedure for these checks. File metadata is tr
 Paste this into your coding agent after cloning:
 
 ```text
-Set up this repository for my own Canvas courses. Read AGENTS.md and
-skills/canvas-dashboard-setup/SKILL.md first. Install dependencies and verify
-the demo before connecting. Check whether I have an institution-approved
-OAuth Developer Key; if not, explain the prerequisite without inventing a
-login-only solution. Keep credentials out of chat, Git and public artifacts.
-I will complete login/MFA and OAuth approval myself. After authorization,
-run read-only synchronization, review changed assessment sources, and verify
-the dashboard on desktop and mobile. Ask me for my hosting destination and
-keep any deployment containing real course data private. Explain remaining
-manual steps and verify the final result rather than only proposing a plan.
+Repository: https://github.com/woodyhouse/nus-canvas-dashboard.git
+Set this up for my own local personal testing. Clone it into a dedicated
+workspace directory if missing; reuse a clean existing clone. Read AGENTS.md
+and skills/canvas-dashboard-setup/SKILL.md. Handle installation and demo checks
+yourself. Explain the personal-testing policy/permission caveat once, then
+open my authenticated Canvas settings page and prepare New Access Token.
+Ask for action-time confirmation before generating a new credential.
+Run npm run canvas:connect to open the separate hidden-input native terminal.
+I will complete login/MFA, confirm credential generation, and copy/paste the
+token myself. Never read token text or clipboard contents, capture a screenshot
+of the token, or put credentials into chat, Git or tool arguments.
+Use the non-secret status receipt to continue sync, build, local loopback
+launch and desktop/mobile verification. Do not ask me to execute each command
+or fill OAuth client secrets for this testing mode. Keep real data private.
+If I later request institutional/multi-user deployment, use approved OAuth.
+Report actual outcomes and any remaining blocked verification.
 ```
 
 For Codex, you may copy `skills/canvas-dashboard-setup` into your personal skill directory; other agents can read that SKILL.md directly. No particular AI vendor is required.
@@ -135,7 +157,7 @@ An agent may configure a 48-hour scheduler after you authorize it. Failed synchr
 - No real screenshots, student IDs, emails, course IDs, grades, PDFs, cache, hosting IDs or old source history were copied.
 - `npm run privacy:check` checks tracked paths and known personal/credential patterns. Visually inspect screenshots; regex checks cannot prove all sensitive content is absent.
 - `npm test` exercises deadline conversion, personal-submission semantics and safe API pagination.
-- OAuth integration requires an approved live key and is **not end-to-end verified against a real institutional OAuth app** in this release.
+- OAuth integration requires an approved live key and is **not end-to-end verified against a real institutional OAuth app** in this release. Personal token input/storage is unit-tested with dummy credentials; live token creation/login remains user-controlled.
 
 ## License
 

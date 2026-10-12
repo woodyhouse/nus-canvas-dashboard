@@ -1,20 +1,20 @@
 ---
 name: canvas-dashboard-setup
-description: Set up and maintain a user's self-hosted Canvas dashboard from this repository, using institution-approved OAuth and source-verified course facts. Use for onboarding, read-only sync, changed-course reviews, and private deployment.
+description: Set up and maintain a user's local Canvas dashboard, including browser-assisted onboarding, hidden terminal credential entry for personal testing, institution-approved OAuth, read-only sync, and private deployment.
 ---
 
 # Canvas dashboard setup
 
-Work from the user's clone; do not assume operating system, course IDs or hosting provider. Read its README and AGENTS.md. The demo is fictional; the user's personal state is ignored by Git.
+Repository: https://github.com/woodyhouse/nus-canvas-dashboard.git. If no checkout exists, clone it into a dedicated directory in the current workspace; do not ask the user for a repository path already provided here. Reuse an existing clone; pull only when the tree is clean. Do not assume operating system or course IDs. Read README and AGENTS.md. The demo is fictional; personal state is ignored by Git. Use skill-appropriate browser tools, never inspect browser cookies or hidden app state.
 
 ## Onboarding
 
 1. Verify Node 22.13+ and npm. Run npm ci, npm test and npm run build. Show demo on desktop and mobile; no Canvas connection is needed for this phase.
-2. Check for an institution-approved OAuth Developer Key registered to this individual deployment. For hosted Canvas the administrator supplies it. Login alone is insufficient. If absent, stop live integration, keep a functional demo, and explain the prerequisite. Do not ask classmates to paste personal API tokens into this distributed app or harvest session cookies.
-3. Run npm run setup. Have the user securely configure .env.local or an equivalent private environment. Do not print secrets, read them into model context, or place them in prompts. Client secrets must not be shared across untrusted student installs.
-4. Run npm run canvas:login; give the user the authorization URL. They complete login, MFA and permission approval. Do not create credentials or grant broad permissions on their behalf.
+2. Select the authorized connection mode. For the user's own local personal testing, follow the [personal terminal flow](references/personal-setup.md); no OAuth Developer Key is needed for that mode. Explain its policy/permission caveat once. Do not present it as the default onboarding for a distributed multi-user service: Canvas requires OAuth there. For institutional/multi-user use, obtain an administrator-approved Developer Key registered to that deployment; if absent, report the blocker.
+3. Run npm run setup. For OAuth, have the user privately configure .env.local or an equivalent secure environment; never print secrets or place them in model context. Shared client secrets must not be distributed to untrusted student installs. For local personal testing, the terminal helper handles credential storage; do not tell the user to edit token values into .env.local.
+4. For OAuth run npm run canvas:login; the user completes login/MFA/approval. For personal testing open the authenticated Canvas settings page, prepare the token dialog and launch npm run canvas:connect as specified in the reference. Obtain action-time confirmation before generating a new credential. Once a token is visible, hand off to the user for copying and hidden terminal entry; do not capture or read it.
 5. Run npm run canvas:sync. Check .local/last-check.json, including unavailable sections. Verify source-backed deadlines and preserve null dates. Do not equate has_submitted_submissions with this student's submission.
-6. Ask only for material missing configuration: timetable/term boundaries and hosting destination. Add verified course-specific facts to ignored data/overrides.local.json; use stable IDs, exact source filename/page or URL, and retain contradictions.
+6. Default to local loopback hosting when the user requested local setup; do not repeatedly ask about hosting. Ask only for material missing timetable/term boundaries or a genuinely unspecified destination. Add verified course facts to ignored data/overrides.local.json; use stable IDs, exact sources, and retain contradictions. After credentials are verified, continue sync, build, launch on 127.0.0.1, and open the dashboard without asking the user to run each command. If a user action is outstanding, monitor the supported receipt/wait mechanism or end with the single required action; never claim completion while a receipt says waiting.
 
 ## Incremental monitoring
 

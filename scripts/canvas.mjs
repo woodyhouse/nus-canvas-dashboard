@@ -13,17 +13,19 @@ export function environment() {
   return { base: base.origin, key: Buffer.from(key, 'hex'), clientId: process.env.CANVAS_CLIENT_ID, clientSecret: process.env.CANVAS_CLIENT_SECRET, redirect: process.env.CANVAS_REDIRECT_URI || 'http://127.0.0.1:8787/callback' };
 }
 export function saveTokens(config, tokens) {
-  mkdirSync(resolve(root, '.local'), { recursive: true, mode: 0o700 });
+  const storeDir = config.storeDir || resolve(root, '.local');
+  mkdirSync(storeDir, { recursive: true, mode: 0o700 });
   const iv = randomBytes(12), cipher = createCipheriv('aes-256-gcm', config.key, iv);
-  const payload = Buffer.concat([cipher.update(JSON.stringify({ ...tokens, origin: config.base, expires_at: Date.now() + (tokens.expires_in || 3600) * 1000 })), cipher.final()]);
-  writeFileSync(resolve(root, '.local/oauth.enc'), JSON.stringify({ iv: iv.toString('hex'), tag: cipher.getAuthTag().toString('hex'), data: payload.toString('hex') }), { mode: 0o600 });
+  const payload = Buffer.concat([cipher.update(JSON.stringify({ ...tokens, origin: config.base, expires_at: tokens.kind === 'personal' ? null : Date.now() + (tokens.expires_in || 3600) * 1000 })), cipher.final()]);
+  writeFileSync(resolve(storeDir, 'oauth.enc'), JSON.stringify({ iv: iv.toString('hex'), tag: cipher.getAuthTag().toString('hex'), data: payload.toString('hex') }), { mode: 0o600 });
 }
 export async function accessToken(config) {
-  const saved = JSON.parse(readFileSync(resolve(root, '.local/oauth.enc'), 'utf8'));
+  const saved = JSON.parse(readFileSync(resolve(config.storeDir || resolve(root, '.local'), 'oauth.enc'), 'utf8'));
   const decipher = createDecipheriv('aes-256-gcm', config.key, Buffer.from(saved.iv, 'hex'));
   decipher.setAuthTag(Buffer.from(saved.tag, 'hex'));
   const tokens = JSON.parse(Buffer.concat([decipher.update(Buffer.from(saved.data, 'hex')), decipher.final()]).toString());
   if (tokens.origin !== config.base) throw new Error('Canvas origin changed; authorize again.');
+  if (tokens.kind === 'personal') return tokens.access_token;
   if (tokens.expires_at > Date.now() + 60000) return tokens.access_token;
   const r = await fetch(config.base + '/login/oauth2/token', { method: 'POST', redirect: 'error', body: new URLSearchParams({ grant_type: 'refresh_token', client_id: config.clientId, client_secret: config.clientSecret, refresh_token: tokens.refresh_token, redirect_uri: config.redirect }) });
   if (!r.ok) throw new Error(`OAuth refresh failed (${r.status}); authorize again.`);

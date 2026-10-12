@@ -33,6 +33,22 @@ npm run dev
 
 ## 连接自己的 Canvas 账户
 
+### 本机个人测试：浏览器 + 隐藏输入终端
+
+用于**自己的本机个人测试**时，agent 可以打开 [Canvas 设置页](https://canvas.nus.edu.sg/profile/settings)，准备 New Access Token 对话框，并执行：
+
+```bash
+npm run canvas:connect
+```
+
+脚本会自动创建本机私有配置，并弹出一个独立的、可见的命令行窗口。确认凭据用途与有效期后，agent 可在工具允许时生成 token，也可以将生成按钮交给你点击。你复制 token 并粘贴到该窗口；**输入不回显，也不会进入聊天**。脚本用只读请求验证 token，加密保存在本机，然后自动同步、构建，并在空闲的本机回环端口启动看板。Agent 只读取不含凭据的状态回执，成功后打开其中的看板地址。使用看板期间请保留该终端窗口。之后运行 `npm run canvas:resume` 即可复用已保存的凭据，无需再次生成 token，除非它已到期或被撤销。
+
+若系统无法弹出原生终端，请在自己的命令行执行 `npm run canvas:token`。个人 token 的权限可能大于本应用使用的只读权限；到期或撤销后需要用户重新配置。不要将 token 发给作者或共享部署服务。
+
+**适用范围：**Canvas 官方允许手动 token 用于应用测试，并要求多用户应用使用 OAuth。这条测试路径不能替代学校或多人应用的正式授权接入。[官方说明](https://developerdocs.instructure.com/services/canvas/oauth2/file.oauth#manual-token-generation)
+
+### 学校 / 多用户 OAuth 接入
+
 **重要前提：**仅登录 Canvas 不会自动获得 API 权限。供其他用户使用的应用需要学校批准的 OAuth Developer Key。对于托管版 Canvas，该 key 由学校管理员签发。本仓库不包含共用的 client secret，也不会要求同学为分发的应用生成并提供个人 access token。详见 [Canvas OAuth 官方文档](https://developerdocs.instructure.com/services/canvas/oauth2/file.oauth)。
 
 当前版本包含一个**单用户本地 OAuth 客户端**。学校需要批准该独立部署所使用的客户端，并登记准确的 redirect URI。共用的学校集成需要由管理员维护后端，不能将其 client secret 分发到每位同学的电脑。
@@ -52,7 +68,7 @@ npm run dev
 
 管理员应在 Developer Key 上限制 scopes，仅允许查询活跃课程、作业（包括当前用户自己的提交记录）、公告、Quiz、Modules 及其条目、Files 和 Calendar 所需的 GET 接口。即使应用仅执行只读查询，未限制 scopes 的 token 仍可能拥有更大的权限。
 
-没有获批的 key 时，可以使用演示模式，或导入自己离线整理的规范化数据。Agent 必须如实说明这个前提，不能抓取浏览器会话凭据或创建宽泛权限来绕过它。
+没有获批的 key 时，学校 / 多用户 OAuth 接入仍受阻；演示模式和离线数据仍可使用。上面的本机个人测试属于独立、明确选择的模式。Agent 不能抓取浏览器会话凭据，也不能静默生成宽泛权限的凭据。
 
 ## 哪些步骤已经自动化？
 
@@ -61,7 +77,7 @@ npm run dev
 - 将 Canvas 时间转换为 Asia/Singapore 时区，并保留历史事项。
 - 使用自己的提交记录，避免将全班提交标记误认为自己已经提交。
 - 在 `.local/last-check.json` 中记录发生变化的栏目哈希与事件。
-- 在需要时刷新 OAuth token，将凭据与个人数据排除在 Git 之外。
+- 在需要时刷新 OAuth token；个人测试 token 到期后由用户更换。凭据与个人数据均排除在 Git 之外。
 - 必要栏目查询失败时，保留上一份看板和基线。被禁用的 Quizzes 栏目（403/404）会明确标记为不可用，供浏览器补查。
 
 ## 哪些信息仍需核验？
@@ -78,14 +94,21 @@ npm run dev
 克隆仓库后，将下面的提示词粘贴给你的编程 agent：
 
 ```text
-请为我的 Canvas 课程配置这个仓库。先阅读 AGENTS.md 和
-skills/canvas-dashboard-setup/SKILL.md。安装依赖，并在连接账户前验证演示模式。
-检查我是否有学校批准的 OAuth Developer Key；如果没有，请说明前提，
-不要声称只登录就能接入。不要把凭据写入聊天、Git 或公开文件。
-我会亲自完成登录、MFA 和 OAuth 授权。授权后执行只读同步，
-核验发生变化的考核资料，并检查桌面端和手机端看板。
-询问我的部署目标，包含真实课程信息的部署必须保持私有。
-说明剩余手动步骤，并验证最终结果，不要只给出方案。
+仓库地址：https://github.com/woodyhouse/nus-canvas-dashboard.git
+请为我自己的本机个人测试配置这个仓库。没有本地仓库就自行克隆到专用目录，
+已有干净仓库则复用。先阅读 AGENTS.md 和 skills/canvas-dashboard-setup/SKILL.md。
+自行安装依赖并验证演示模式。说明一次个人测试的政策与权限限制，
+随后打开我已登录的 Canvas 设置页并准备 New Access Token。
+生成新凭据前，请确认这次操作的用途与有效期。
+执行 npm run canvas:connect，弹出独立的隐藏输入命令行窗口。
+我会完成登录/MFA、确认生成，并自行复制 token 粘贴进去。
+不要读取 token 或剪贴板内容，不要截取显示 token 的页面，
+也不要将凭据写入聊天、Git、日志或工具命令参数。
+通过不含凭据的状态回执确认成功后，继续只读同步、构建、
+在 127.0.0.1 启动，并核验桌面与手机视图。不要让我逐条执行命令，
+这个测试模式也不需要让我填写 OAuth client secret。真实数据保持私有。
+将来若我要求学校或多人部署，再使用获批的 OAuth。
+请报告实际结果和仍未验证的步骤，不要只给出方案。
 ```
 
 Codex 用户可以将 `skills/canvas-dashboard-setup` 复制到自己的 skill 目录；其他 agent 可以直接阅读其中的 `SKILL.md`。不要求使用特定 AI 厂商。
@@ -133,7 +156,7 @@ docker run --rm -p 127.0.0.1:3000:3000 canvas-dashboard
 - 未复制真实截图、学号、邮箱、课程 ID、成绩、PDF、缓存、托管标识或旧项目历史。
 - `npm run privacy:check` 检查被跟踪的文件路径与已知个人信息/凭据模式。截图仍需人工查看；正则检查无法证明所有敏感内容都已排除。
 - `npm test` 覆盖截止时间转换、个人提交状态语义与安全的 API 分页。
-- OAuth 集成需要获批的真实 key，当前版本**尚未对真实学校 OAuth 应用完成端到端验证**。
+- OAuth 集成需要获批的真实 key，当前版本**尚未对真实学校 OAuth 应用完成端到端验证**。个人 token 输入和存储已使用虚构凭据做单元测试；真实 token 的生成与登录仍由用户控制。
 
 ## 许可证
 
