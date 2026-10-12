@@ -34,12 +34,12 @@ export async function sync() {
   };
   for (const c of courses) {
     const code = c.course_code || String(c.id);
-    for (const [section, path] of Object.entries({ assignments: `/courses/${c.id}/assignments?include[]=submission&per_page=100`, quizzes: `/courses/${c.id}/quizzes?per_page=100`, files: `/courses/${c.id}/files?per_page=100`, modules: `/courses/${c.id}/modules?include[]=items&per_page=100`, announcements: `/announcements?context_codes[]=course_${c.id}&start_date=2000-01-01&end_date=${new Date().toISOString().slice(0,10)}&per_page=100`, calendar: `/calendar_events?context_codes[]=course_${c.id}&all_events=true&per_page=100` })) {
+    for (const [section, path] of Object.entries({ assignments: `/courses/${c.id}/assignments?include[]=submission&per_page=100`, quizzes: `/courses/${c.id}/quizzes?per_page=100`, files: `/courses/${c.id}/files?per_page=100`, modules: `/courses/${c.id}/modules?include[]=items&per_page=100`, announcements: `/announcements?context_codes[]=course_${c.id}&start_date=2000-01-01&end_date=${new Date(Date.now()+86400000).toISOString().slice(0,10)}&per_page=100`, calendar: `/calendar_events?context_codes[]=course_${c.id}&all_events=true&per_page=100` })) {
       const key = `${c.id}:${section}`;
       try {
         const rows = await getAll(config.base, token, path);
         // Store only fields used by this app. Never retain signed download URLs, grades, or tokens.
-        const safe = rows.map(r => section === 'files' ? { id: r.id, display_name: r.display_name, updated_at: r.updated_at, size: r.size } : section === 'modules' ? { id: r.id, name: r.name, items: (r.items || []).map(i => ({ id: i.id, title: i.title, type: i.type, content_id: i.content_id })) } : { id: r.id, title: r.title || r.name, updated_at: r.updated_at, due_at: r.due_at, posted_at: r.posted_at, start_at: r.start_at });
+        const safe = rows.map(r => section === 'files' ? { id: r.id, display_name: r.display_name, updated_at: r.updated_at, size: r.size } : section === 'modules' ? { id: r.id, name: r.name, items: (r.items || []).map(i => ({ id: i.id, title: i.title, type: i.type, content_id: i.content_id })) } : { id: r.id, title: r.title || r.name, updated_at: r.updated_at, due_at: r.due_at, posted_at: r.posted_at, start_at: r.start_at, contentHash: createHash('sha256').update(JSON.stringify({body:r.description || r.message, due:r.due_at, lock:r.lock_at, unlock:r.unlock_at, submissionTypes:r.submission_types, timeLimit:r.time_limit})).digest('hex') });
         snapshot[key] = { hash: createHash('sha256').update(JSON.stringify(safe)).digest('hex'), rows: safe };
         if (prior[key]?.hash !== snapshot[key].hash) changes.push(key);
         if (section === 'assignments') rows.forEach(a => put(assignmentEvent(code, a)));
@@ -66,3 +66,4 @@ export async function sync() {
   console.log(`Synced ${courses.length} courses; ${new Set(changes).size} changed records/sections. Rebuild to deploy the refreshed private snapshot.`);
 }
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) sync().catch(() => { console.error('Canvas sync failed. Dashboard freshness was not advanced. Check local configuration and .local/last-check.json.'); process.exitCode = 1; });
+
