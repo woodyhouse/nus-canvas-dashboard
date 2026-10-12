@@ -1,15 +1,42 @@
 {
-  "name": "nus-canvas-dashboard", "version": "0.1.0", "private": true,
-  "engines": { "node": ">=22.13.0" }, "type": "module",
+  "name": "nus-canvas-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "type": "module",
   "scripts": {
-    "setup": "node scripts/setup.mjs", "predev": "node scripts/setup.mjs --demo",
-    "dev": "next dev", "prebuild": "node scripts/setup.mjs --demo",
-    "build": "next build", "start": "next start", "canvas:login": "node scripts/oauth.mjs",
-    "canvas:sync": "node scripts/sync.mjs", "canvas:connect": "node scripts/connect.mjs",
-    "canvas:token": "node scripts/token-input.mjs --bootstrap", "canvas:resume": "node scripts/resume.mjs",
+    "setup": "node scripts/setup.mjs",
+    "predev": "node scripts/setup.mjs --demo",
+    "dev": "next dev",
+    "prebuild": "node scripts/setup.mjs --demo",
+    "build": "next build",
+    "start": "next start",
+    "canvas:login": "node scripts/oauth.mjs",
+    "canvas:sync": "node scripts/sync.mjs",
+    "canvas:connect": "node scripts/connect.mjs",
+    "canvas:token": "node scripts/token-input.mjs --bootstrap",
+    "canvas:resume": "node scripts/resume.mjs",
+    "canvas:auto": "node scripts/auto-connect.mjs",
+    "canvas:browser:install": "playwright install chromium",
     "test": "node --test tests/*.test.mjs",
+    "test:browser": "node scripts/test-auto-browser.mjs",
     "privacy:check": "node scripts/privacy-check.mjs"
   },
-  "dependencies": { "lucide-react": "^0.468.0", "next": "16.4.0", "react": "19.2.6", "react-dom": "19.2.6" },
-  "devDependencies": { "@tailwindcss/postcss": "4.2.1", "@types/node": "22.19.19", "@types/react": "19.2.14", "@types/react-dom": "19.2.3", "tailwindcss": "4.2.1", "typescript": "5.9.3" }
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "next": "16.4.0",
+    "playwright": "1.64.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3"
+  }
 }

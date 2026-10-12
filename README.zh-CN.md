@@ -33,6 +33,20 @@ npm run dev
 
 ## 连接自己的 Canvas 账户
 
+### 本机测试推荐入口：独立脚本，无需复制 token
+
+```bash
+npm ci
+npm run canvas:browser:install
+npm run canvas:auto
+```
+
+脚本弹出可见的本机终端并打开独立浏览器。你完成 Canvas 登录/MFA；脚本自动填写用途与 30 天有效期，在终端显示权限提示后，由你输入 `YES` 确认生成。脚本在本机内存中读取 token，以只读 API 验证并加密保存，关闭登录浏览器，自动同步、构建、启动看板。**无需复制粘贴，agent 不参与凭据环节**。不使用剪贴板、不打印 token、不录制页面，也不导出或保存登录 cookies。终端显示看板地址，请保留终端维持服务。
+
+独立浏览器不复用 Codex 侧边浏览器的登录状态。已有凭据会直接复用；明确需要更换时才执行 `npm run canvas:auto -- --replace`，仍需本机确认。取消不会生成，失败不会自动重试。当前适配 Canvas 英文表单；其他界面版本可能需要调整。仅供自己的本机个人测试，多用户服务仍需 OAuth。
+
+Agent 应阅读 [独立脚本配置流程](skills/canvas-dashboard-setup/references/standalone-setup.md)，只查看无密钥回执，不能接管该浏览器或代替输入确认。`npm run test:browser` 在真实 Playwright 浏览器中使用虚构页面与凭据测试，不访问学生账户。
+
 ### 本机个人测试：浏览器 + 隐藏输入终端
 
 用于**自己的本机个人测试**时，agent 可以打开 [Canvas 设置页](https://canvas.nus.edu.sg/profile/settings)，准备 New Access Token 对话框，并执行：
@@ -100,10 +114,10 @@ npm run dev
 请为我自己的本机个人测试配置这个仓库。没有本地仓库就自行克隆到专用目录，
 已有干净仓库则复用。先阅读 AGENTS.md 和 skills/canvas-dashboard-setup/SKILL.md。
 自行安装依赖并验证演示模式。说明一次个人测试的政策与权限限制，
-随后打开我已登录的 Canvas 设置页并准备 New Access Token。
-生成新凭据前，请确认这次操作的用途与有效期。
-执行 npm run canvas:connect，弹出独立的隐藏输入命令行窗口。
-我会完成登录/MFA、确认生成，并自行复制 token 粘贴进去。
+运行 npm run canvas:browser:install，然后执行 npm run canvas:auto。
+我会在脚本自己的浏览器完成登录/MFA，在本机终端确认生成。
+token 的生成、读取、验证与加密保存由独立脚本完成，无需复制粘贴。
+不要接管该浏览器或代替我输入 YES；只读取无密钥状态回执。
 不要读取 token 或剪贴板内容，不要截取显示 token 的页面，
 也不要将凭据写入聊天、Git、日志或工具命令参数。
 通过不含凭据的状态回执确认成功后，继续只读同步、构建、

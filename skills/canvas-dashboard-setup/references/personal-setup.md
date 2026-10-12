@@ -1,5 +1,7 @@
 # Personal local testing: browser + hidden terminal
 
+Manual-paste fallback. Prefer [standalone setup](standalone-setup.md) when the user wants no agent involvement in credential transfer.
+
 This is a user-requested, single-user local testing path. Canvas documents manual tokens for testing and requires OAuth for applications used by multiple users. Do not market this path as policy-compliant multi-user onboarding. Tokens can have write permissions even though the scripts query GET endpoints only. Never collect tokens for the maintainer or a shared server.
 
 1. Clone/reuse the repository; npm ci; npm run setup. Detect the OS and available browser/terminal tooling yourself. Do not ask the user to type installation/configuration commands the agent can execute safely.

@@ -33,6 +33,20 @@ Open http://localhost:3000. `predev` creates an ignored `data/events.json` from 
 
 ## Connect your Canvas account
 
+### Standalone local testing: no token copy/paste
+
+```bash
+npm ci
+npm run canvas:browser:install
+npm run canvas:auto
+```
+
+The script opens a visible native terminal and its own ephemeral browser. Complete login/MFA; it fills the purpose and 30-day expiry and requires you to type `YES` after a permission/storage warning. It reads the token only in local memory, verifies via read-only API, encrypts it, closes the browser, and syncs/builds/starts the dashboard. **No agent participation or clipboard**. No token logs, screenshots, traces or exported/saved login cookies. Keep the terminal open while using the displayed local URL.
+
+This browser does not inherit the Codex side-panel session. Existing credentials are reused; explicit replacement uses `npm run canvas:auto -- --replace` with local confirmation. Cancellation creates no token; failures never retry generation. Current selectors target the English Canvas form. Personal testing only; multi-user services require OAuth.
+
+Agents must follow [standalone setup](skills/canvas-dashboard-setup/references/standalone-setup.md), read only safe receipts, and never attach to this browser or answer confirmation. `npm run test:browser` tests a real Playwright browser with fictional pages/credentials, without student accounts.
+
 ### Personal local testing: browser + hidden terminal
 
 For **your own local testing**, an agent can open [Canvas settings](https://canvas.nus.edu.sg/profile/settings), prepare the New Access Token dialog and run:
@@ -101,11 +115,11 @@ Set this up for my own local personal testing. Clone it into a dedicated
 workspace directory if missing; reuse a clean existing clone. Read AGENTS.md
 and skills/canvas-dashboard-setup/SKILL.md. Handle installation and demo checks
 yourself. Explain the personal-testing policy/permission caveat once, then
-open my authenticated Canvas settings page and prepare New Access Token.
-Ask for action-time confirmation before generating a new credential.
-Run npm run canvas:connect to open the separate hidden-input native terminal.
-I will complete login/MFA, confirm credential generation, and copy/paste the
-token myself. Never read token text or clipboard contents, capture a screenshot
+run npm run canvas:browser:install and npm run canvas:auto.
+I will log in/MFA in the script's browser and confirm generation in its local
+terminal. The script generates, reads, verifies and encrypts the token without
+copy/paste. Do not attach to that browser or enter YES for me.
+Never read token text or clipboard contents, capture a screenshot
 of the token, or put credentials into chat, Git or tool arguments.
 Use the non-secret status receipt to continue sync, build, local loopback
 launch and desktop/mobile verification. Do not ask me to execute each command
